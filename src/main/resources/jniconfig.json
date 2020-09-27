@@ -1,0 +1,30 @@
+[
+  {
+    "name" : "org.quantlib.Date",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.quantlib.Calendar",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  },
+  {
+    "name" : "org.quantlib.TARGET",
+    "allDeclaredConstructors" : true,
+    "allPublicConstructors" : true,
+    "allDeclaredMethods" : true,
+    "allPublicMethods" : true,
+    "allDeclaredClasses" : true,
+    "allPublicClasses" : true
+  }
+
+]
