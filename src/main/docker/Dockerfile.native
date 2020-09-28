@@ -15,14 +15,24 @@
 #
 ###
 #FROM registry.access.redhat.com/ubi8/ubi-minimal:8.1
-FROM suhasghorp/quantlib:latest
+#FROM suhasghorp/quantlib:latest
+FROM ubuntu:latest
 WORKDIR /work/
 RUN chown 1001 /work \
     && chmod "g+rwX" /work \
     && chown 1001:root /work
 COPY --chown=1001:root target/*-runner /work/application
 COPY --chown=1001:root target/resources/* /work/
-#ENV LD_LIBRARY_PATH .:$LD_LIBRARY_PATH
+RUN ln -s libQuantLib.so.0.0.0 libQuantLib.so.0
+RUN ln -s libQuantLib.so.0.0.0 libQuantLib.so
+#COPY --chown=1001:root target/resources/libQuantLib.la /usr/lib/
+#COPY --chown=1001:root target/resources/libQuantLib.so.0.0.0 /usr/lib/
+#RUN cd /usr/lib && ln -s libQuantLib.so.0.0.0 libQuantLib.so.0
+#RUN cd /usr/lib && ln -s libQuantLib.so.0.0.0 libQuantLib.so
+ENV LD_LIBRARY_PATH .:$LD_LIBRARY_PATH
+RUN ldconfig
+
+
 EXPOSE 8080
 USER 1001
 
