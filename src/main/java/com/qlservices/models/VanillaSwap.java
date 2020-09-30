@@ -19,23 +19,39 @@ public class VanillaSwap {
     public double fixedLegRate;
     public org.quantlib.DayCounter fixedLegDayCount,floatingLegDayCount;
     public double floatingLegSpread;
-    public double npv;
+    public double dv01, netPresentValue, fairRate;
     org.quantlib.VanillaSwap qlSwap;
-
+    Schedule fixedLegSchedule, floatingLegSchedule;
 
     public VanillaSwap(){}
 
-    public void setPricingEngine(org.quantlib.DiscountingSwapEngine engine, org.quantlib.IborIndex floatingLegIborIndex){
-        Schedule fixedLegSchedule = new Schedule(startDate,maturityDate,new Period(fixedLegFrequency),
+    public void setPricingEngine(DiscountingSwapEngine engine, IborIndex floatingLegIborIndex){
+        fixedLegSchedule = new Schedule(startDate,maturityDate,new Period(fixedLegFrequency),
                 fixedLegCalendar,fixedLegConvention, fixedLegConvention,fixedLegDateGenerationRule,false);
-        Schedule floatingLegSchedule = new Schedule(startDate,maturityDate,new Period(floatingLegFrequency),
+        floatingLegSchedule = new Schedule(startDate,maturityDate,new Period(floatingLegFrequency),
                 floatingLegCalendar,floatingLegConvention, floatingLegConvention,floatingLegDateGenerationRule,false);
         qlSwap = new org.quantlib.VanillaSwap(swapType,nominal,
                 fixedLegSchedule,fixedLegRate,fixedLegDayCount,
                 floatingLegSchedule,floatingLegIborIndex,floatingLegSpread,floatingLegDayCount);
         qlSwap.setPricingEngine(engine);
     }
-    public void npv(){
-        npv = qlSwap.NPV();
+
+    public Schedule getFloatingSchedule(){
+        return floatingLegSchedule;
     }
+
+    public Schedule getFixedSchedule(){
+        return fixedLegSchedule;
+    }
+
+    public double fairRate(){
+        return qlSwap.fairRate();
+    }
+
+    public double npv(){
+        return qlSwap.NPV();
+    }
+
+
+
 }

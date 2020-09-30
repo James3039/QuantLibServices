@@ -1,10 +1,15 @@
 package com.qlservices.util;
 
+import com.qlservices.MarketData;
+import com.qlservices.models.Fixing;
 import org.quantlib.*;
 
+import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class Utils {
 
@@ -23,8 +28,27 @@ public class Utils {
         put(12, Month.December);
     }};
 
+    public static final Map<Month,Integer> monthReversedMap = new HashMap<>() {{
+        put(Month.January,1 );
+        put(Month.February, 2);
+        put(Month.March, 3);
+        put(Month.April, 4);
+        put(Month.May,5 );
+        put(Month.June, 6);
+        put(Month.July, 7);
+        put(Month.August, 8);
+        put(Month.September, 9);
+        put(Month.October, 10);
+        put(Month.November, 11);
+        put(Month.December, 12);
+    }};
+
     public static Date javaDateToQLDate(LocalDate dt) {
         return new Date(dt.getDayOfMonth(), monthMap.get(dt.getMonthValue()), dt.getYear());
+    }
+
+    public static LocalDate qlDateToJavaDate(Date qlDate){
+        return LocalDate.of(qlDate.year(), monthReversedMap.get(qlDate.month()), qlDate.dayOfMonth());
     }
 
     public static org.quantlib.BusinessDayConvention getBusDayConvention(String conv) {
@@ -128,6 +152,15 @@ public class Utils {
                 ret = new Actual360();
                 break;
         }
+        return ret;
+    }
+
+    public Optional<Double> getFixingForDate(Date dt, String currency, String tenor) throws Exception{
+        Optional<Double> ret = Optional.empty();
+        List<Fixing> fixings = new MarketData().getFixingsMarketData(currency, tenor);
+        Optional<Fixing> fixing = fixings.stream().filter(fix -> fix.date.serialNumber() == dt.serialNumber()).findFirst();
+        if (fixing.isPresent())
+            ret = Optional.of(fixing.get().rate);
         return ret;
     }
 }
