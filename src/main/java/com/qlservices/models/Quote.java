@@ -1,6 +1,7 @@
 package com.qlservices.models;
 
 import org.quantlib.QuoteHandle;
+import org.quantlib.RelinkableQuoteHandle;
 import org.quantlib.SimpleQuote;
 
 public class Quote {
@@ -9,6 +10,7 @@ public class Quote {
     public double rate;
     public SimpleQuote simpleQuote;
     public QuoteHandle quoteHandle;
+
 
     public Quote(){}
 

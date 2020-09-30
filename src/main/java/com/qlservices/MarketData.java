@@ -10,10 +10,8 @@ import org.quantlib.Date;
 import org.quantlib.Settings;
 
 import javax.inject.Singleton;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -31,11 +29,16 @@ public class MarketData {
     }
 
     @CacheResult(cacheName = "projection-curve-cache")
-    public List<Quote> getProjectionMarketData(@CacheKey LocalDate date, @CacheKey String currency, @CacheKey String tenor) throws IOException {
+    public List<Quote> getProjectionMarketData(@CacheKey LocalDate date, @CacheKey String currency, @CacheKey String tenor) throws Exception {
         List<Quote> quotes = new ArrayList<>();
         String fileName = currency + "-LIBOR-" + tenor + ".csv";
-        InputStream inputStream = getClass().getResourceAsStream("/market-data/" + fileName);
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+        LOG.info("current dir:" + Paths.get(".").toAbsolutePath().normalize().toString());
+        //InputStream inputStream = getClass().getResourceAsStream("/market-data/" + fileName);
+        String marketDataPath = System.getProperty("market_data_path");
+        LOG.info("using market data path: " + marketDataPath);
+        //InputStream inputStream = getClass().getResourceAsStream(marketDataPath + "/" + fileName);
+        //BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(marketDataPath + "/" + fileName)));
         for (String line = br.readLine(); line != null; line = br.readLine()) {
             String quote = line.split(",")[0];
             String quoteType = quote.split("\\.")[0];
@@ -43,6 +46,7 @@ public class MarketData {
             double rate = Double.parseDouble(line.split(",")[1]);
             quotes.add(new Quote(quoteType,ten,rate));
         }
+        br.close();
         LOG.info("Loaded projection market data records:" + quotes.size());
         return quotes;
     }
@@ -56,13 +60,18 @@ public class MarketData {
         } else if (currency.equals("EUR")){
             fileName = currency + "-EONIA.csv";
         }
-        InputStream inputStream = getClass().getResourceAsStream("/market-data/" + fileName);
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+        //InputStream inputStream = getClass().getResourceAsStream("/market-data/" + fileName);
+        String marketDataPath = System.getProperty("market_data_path");
+        LOG.info("using market data path: " + marketDataPath);
+        //InputStream inputStream = getClass().getResourceAsStream(marketDataPath + "/" + fileName);
+        //BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(marketDataPath + "/" + fileName)));
         for (String line = br.readLine(); line != null; line = br.readLine()) {
             String ten = line.split(",")[0];
             double rate = Double.parseDouble(line.split(",")[1]);
             quotes.add(new Quote("OISSWAP",ten,rate));
         }
+        br.close();
         LOG.info("Loaded discount market data records:" + quotes.size());
         return quotes;
     }
@@ -87,13 +96,18 @@ public class MarketData {
             cursor.close();
         }*/
         String fileName = currency + "-FIXINGS-" + tenor + ".csv";
-        InputStream inputStream = getClass().getResourceAsStream("/market-data/" + fileName);
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+        String marketDataPath = System.getProperty("market_data_path");
+        LOG.info("using market data path: " + marketDataPath);
+        //InputStream inputStream = getClass().getResourceAsStream("/market-data/" + fileName);
+        //InputStream inputStream = getClass().getResourceAsStream(marketDataPath + "/" + fileName);
+        //BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(marketDataPath + "/" + fileName)));
         for (String line = br.readLine(); line != null; line = br.readLine()) {
             LocalDate dt = LocalDate.parse(line.split(",")[0],DateTimeFormatter.ofPattern("MM-dd-yyyy"));
             double rate = Double.parseDouble(line.split(",")[1]);
             fixings.add(new Fixing(Utils.javaDateToQLDate(dt),rate));
         }
+        br.close();
         LOG.info("Loaded fixings market data records:" + fixings.size());
         return fixings;
     }

@@ -69,13 +69,16 @@ public class PriceResource {
         swap.dv01 = swap.swapType == org.quantlib.VanillaSwap.Type.Payer ? dv01 : -1.0 * dv01;
 
         projectionTermStructure.linkTo(projectionCurve);
-        List<com.qlservices.models.Quote> quotes = marketData.getProjectionMarketData(marketData.getEvaluationJavaDate(), "USD","3M");
+        List<com.qlservices.models.Quote> quotes = marketData.getProjectionMarketData(marketData.getEvaluationJavaDate(), "USD", "3M");
         for (com.qlservices.models.Quote quote : quotes){
             double value = quote.simpleQuote.value();
             quote.simpleQuote.setValue(value + 0.0001);
+            //projectionTermStructure.linkTo(projectionCurve);
             double krdnpv = swap.netPresentValue - swap.npv();
             LOG.info(quote.tenor + " KRD: " + krdnpv);
             quote.simpleQuote.setValue(value);
+            //quote.quoteHandle.linkTo(new SimpleQuote(value));
+            //projectionTermStructure.linkTo(projectionCurve);
         }
 
         return swap;
