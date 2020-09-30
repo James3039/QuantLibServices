@@ -20,7 +20,7 @@ public class SwapResourceTest {
                 .when().post("/price/vanillaswap")
                 .then()
                 .statusCode(200)
-                .body(is("{\"id\":\"738641\",\"npv\":-212961.84572721188,\"dv01\":-1401.8211129264382,\"fair rate\":0.010191255905995466}"));
+                .body(is("{\"id\":\"738641\",\"npv\":-212984.07624602452,\"dv01\":-1401.8058139089408,\"fair rate\":0.010189923291115798}"));
 
         given()
                 .body("{\"ID\": \"19199\", \"swapType\": \"RECEIVER\", \"nominal\": 1000000000.0, \"startDate\": \"07-11-2008\", \"maturityDate\": \"07-11-2023\", \"fixedLegRate\": 0.0478, \"floatingLegSpread\": 0.0, \"convention\" : \"USD\"}")
@@ -28,14 +28,14 @@ public class SwapResourceTest {
                 .when().post("/price/vanillaswap")
                 .then()
                 .statusCode(200)
-                .body(is("{\"id\":\"19199\",\"npv\":135933734.2142064,\"dv01\":-299194.43726980686,\"fair rate\":0.0023739072062620645}"));
+                .body(is("{\"id\":\"19199\",\"npv\":135938141.6394385,\"dv01\":-299157.16063190997,\"fair rate\":0.002372468995052744}"));
         given()
                 .body("{\"ID\": \"74839\", \"swapType\": \"RECEIVER\", \"nominal\": 250000000.0, \"startDate\": \"12-23-2009\", \"maturityDate\": \"12-23-2024\", \"fixedLegRate\": 0.0447, \"floatingLegSpread\": 0.0, \"convention\" : \"USD\"}")
                 .header("Content-Type", MediaType.APPLICATION_JSON)
                 .when().post("/price/vanillaswap")
                 .then()
                 .statusCode(200)
-                .body(is("{\"id\":\"74839\",\"npv\":47143907.62139006,\"dv01\":-111939.46287095547,\"fair rate\":0.0027383946417408322}"));
+                .body(is("{\"id\":\"74839\",\"npv\":47146481.43712306,\"dv01\":-111927.42829221487,\"fair rate\":0.0027362009839928467}"));
     }
 
 }

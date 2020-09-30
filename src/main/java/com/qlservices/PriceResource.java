@@ -1,8 +1,8 @@
 package com.qlservices;
 
+import com.qlservices.models.Fixing;
 import com.qlservices.models.VanillaSwap;
 import com.qlservices.services.CurveBuilderService;
-import com.qlservices.util.Utils;
 import org.jboss.logging.Logger;
 import org.quantlib.*;
 
@@ -28,7 +28,7 @@ public class PriceResource {
     @POST
     @Path("vanillaswap")
     public VanillaSwap price(VanillaSwap swap) throws Exception {
-        Calendar cal = new WeekendsOnly(); //UnitedStates();
+
         RelinkableYieldTermStructureHandle discountTermStructure = new RelinkableYieldTermStructureHandle();
         RelinkableYieldTermStructureHandle projectionTermStructure = new RelinkableYieldTermStructureHandle();
 
@@ -45,8 +45,9 @@ public class PriceResource {
         swap.setPricingEngine(engine, index);
         LOG.info("pricing engine set");
         Schedule floatingLegSchedule = swap.getFloatingSchedule();
+        Calendar cal = new WeekendsOnly(); //UnitedStates();
         Date prevDate = cal.advance(floatingLegSchedule.previousDate(Settings.instance().getEvaluationDate()), -2, TimeUnit.Days);
-        Optional<Double> fixing = new Utils().getFixingForDate(prevDate, "USD", "3M");
+        Optional<Double> fixing = getFixingForDate(prevDate, "USD", "3M");
         if (fixing.isPresent())
             index.addFixing(prevDate, fixing.get());
         LOG.info("fixcing added");
@@ -73,10 +74,19 @@ public class PriceResource {
             double value = quote.simpleQuote.value();
             quote.simpleQuote.setValue(value + 0.0001);
             double krdnpv = swap.netPresentValue - swap.npv();
-            //LOG.info(quote.tenor + " KRD: " + krdnpv);
+            LOG.info(quote.tenor + " KRD: " + krdnpv);
             quote.simpleQuote.setValue(value);
         }
 
         return swap;
+    }
+
+    public Optional<Double> getFixingForDate(Date dt, String currency, String tenor) throws Exception{
+        Optional<Double> ret = Optional.empty();
+        List<Fixing> fixings = marketData.getFixingsMarketData(currency, tenor);
+        Optional<Fixing> fixing = fixings.stream().filter(fix -> fix.date.serialNumber() == dt.serialNumber()).findFirst();
+        if (fixing.isPresent())
+            ret = Optional.of(fixing.get().rate);
+        return ret;
     }
 }

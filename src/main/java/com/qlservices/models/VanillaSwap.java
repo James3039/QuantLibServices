@@ -20,8 +20,8 @@ public class VanillaSwap {
     public org.quantlib.DayCounter fixedLegDayCount,floatingLegDayCount;
     public double floatingLegSpread;
     public double dv01, netPresentValue, fairRate;
-    org.quantlib.VanillaSwap qlSwap;
-    Schedule fixedLegSchedule, floatingLegSchedule;
+    public org.quantlib.VanillaSwap qlSwap;
+    public Schedule fixedLegSchedule, floatingLegSchedule;
 
     public VanillaSwap(){}
 

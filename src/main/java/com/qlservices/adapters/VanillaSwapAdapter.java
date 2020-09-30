@@ -40,17 +40,17 @@ public class VanillaSwapAdapter implements JsonbAdapter<VanillaSwap, JsonObject>
         swap.floatingLegSpread = jsonObject.getJsonNumber("floatingLegSpread").doubleValue();
         if (jsonObject.containsKey("convention")){
             if (jsonObject.getString("convention").equals("USD")){
-                swap.fixedLegFrequency = USDConventions.SWAP_FIXED_FREQUENCY;
-                swap.fixedLegCalendar = USDConventions.SWAP_FIXED_CALENDAR;
-                swap.fixedLegConvention = USDConventions.SWAP_FIXED_CONVENTION;
+                swap.fixedLegFrequency = new USDConventions().SWAP_FIXED_FREQUENCY();
+                swap.fixedLegCalendar = new USDConventions().SWAP_FIXED_CALENDAR();
+                swap.fixedLegConvention = new USDConventions().SWAP_FIXED_CONVENTION();
                 swap.fixedLegDateGenerationRule = DateGeneration.Rule.Backward;
-                swap.fixedLegDayCount = USDConventions.SWAP_FIXED_DAY_COUNTER;
+                swap.fixedLegDayCount = new USDConventions().SWAP_FIXED_DAY_COUNTER();
 
-                swap.floatingLegFrequency = USDConventions.SWAP_FLOATING_FREQUENCY;
-                swap.floatingLegCalendar = USDConventions.SWAP_FLOATING_CALENDAR;
-                swap.floatingLegConvention = USDConventions.SWAP_FLOATING_CONVENTION;
+                swap.floatingLegFrequency = new USDConventions().SWAP_FLOATING_FREQUENCY();
+                swap.floatingLegCalendar = new USDConventions().SWAP_FLOATING_CALENDAR();
+                swap.floatingLegConvention = new USDConventions().SWAP_FLOATING_CONVENTION();
                 swap.floatingLegDateGenerationRule = DateGeneration.Rule.Backward;
-                swap.floatingLegDayCount = USDConventions.SWAP_FLOATING_DAY_COUNTER;
+                swap.floatingLegDayCount = new USDConventions().SWAP_FLOATING_DAY_COUNTER();
 
             } else {
 

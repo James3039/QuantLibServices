@@ -9,7 +9,7 @@ import org.jboss.logging.Logger;
 import org.quantlib.Date;
 import org.quantlib.Settings;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Singleton;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,10 +19,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-@ApplicationScoped
+@Singleton
 public class MarketData {
     private static final Logger LOG = Logger.getLogger(MarketData.class);
-
     public MarketData(){}
 
     @CacheResult(cacheName = "evluation-date-cache")
@@ -71,6 +70,22 @@ public class MarketData {
     @CacheResult(cacheName = "fixings-cache")
     public List<Fixing> getFixingsMarketData(@CacheKey String currency, @CacheKey String tenor) throws IOException {
         List<Fixing> fixings = new ArrayList<>();
+
+
+
+        /*MongoCollection fixingsCollection = mongoClient.getDatabase("marketdata").getCollection("USD-FIXINGS-3M");
+        MongoCursor<Document> cursor = fixingsCollection.find().iterator();
+        try {
+            while (cursor.hasNext()) {
+                Document document = cursor.next();
+                Fixing fixing = new Fixing();
+                LocalDate dt = LocalDate.parse(document.getString("date"),DateTimeFormatter.ofPattern("MM-dd-yyyy"));
+                double rate = Double.parseDouble(document.getString("rate"));
+                fixings.add(new Fixing(Utils.javaDateToQLDate(dt),rate));
+            }
+        } finally {
+            cursor.close();
+        }*/
         String fileName = currency + "-FIXINGS-" + tenor + ".csv";
         InputStream inputStream = getClass().getResourceAsStream("/market-data/" + fileName);
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));

@@ -70,73 +70,69 @@ public class CurveBuilderService {
         discountTermStructure.linkTo(discountCurve);
         List<Quote> quotes = marketData.getProjectionMarketData(marketData.getEvaluationJavaDate(), currency,tenor);
         for (Quote quote : quotes){
-            LOG.info("inside loop");
             String quoteType = quote.quoteName;
             String ten = quote.tenor;
             if (currency.equals("USD")) {
-                LOG.info("about to add usdratehelper");
-                rateHelpers.add(getUSDRateHelper(quoteType, ten, quote.quoteHandle, discountTermStructure));
-                LOG.info("done adding usdartehelper");
+                rateHelpers.add(getUSDRateHelper(quoteType, ten, quote.simpleQuote, discountTermStructure));
             } else if (currency.equals("EUR")){
-                rateHelpers.add(getEURRateHelper(quoteType, ten, quote.quoteHandle, discountTermStructure));
+                rateHelpers.add(getEURRateHelper(quoteType, ten, quote.simpleQuote, discountTermStructure));
             }
         }
-        LOG.info("added rate helpers");
+
         if (currency.equals("USD")){
-            projectionCurve = new PiecewiseLinearZero(settlementDate, rateHelpers, USDConventions.CURVE_DAY_COUNTER);
+            projectionCurve = new PiecewiseLinearZero(settlementDate, rateHelpers, new USDConventions().CURVE_DAY_COUNTER());
             projectionCurve.enableExtrapolation();
-            LOG.info("piecewiselinearzero built");
-            //ryts = new RelinkableYieldTermStructureHandle(yts);
         } else if (currency.equals("EUR")){
             projectionCurve = new PiecewiseLinearZero(settlementDate, rateHelpers, EURConventions.CURVE_DAY_COUNTER);
             projectionCurve.enableExtrapolation();
-            //ryts = new RelinkableYieldTermStructureHandle(yts);
         }
         LOG.info("finsihed building projection curve");
         return projectionCurve;
     }
 
-    private RateHelper getUSDRateHelper(String quoteType, String tenor, QuoteHandle quoteHandle, RelinkableYieldTermStructureHandle discountCurve){
+    private RateHelper getUSDRateHelper(String quoteType, String tenor, org.quantlib.Quote simpleQuote, RelinkableYieldTermStructureHandle discountCurve){
         RateHelper helper = null;
-        LOG.info("in usdratehelper");
+
         if (quoteType.equals("Depos")){
-            LOG.info("inside depos");
-            helper = new DepositRateHelper(quoteHandle, new Period(tenor),
-                    USDConventions.DEPOSIT_FIXING_DAYS,
-                    USDConventions.DEPOSIT_CALENDAR,
-                    USDConventions.DEPOSIT_BUSINESS_DAY_CONVENTION,
-                    USDConventions.DEPOSIT_END_OF_MONTH,
-                    USDConventions.DEPOSIT_DAY_COUNTER
+
+            helper = new DepositRateHelper(new QuoteHandle(simpleQuote), new Period(tenor),
+                    new USDConventions().DEPOSIT_FIXING_DAYS(),
+                    new USDConventions().DEPOSIT_CALENDAR(),
+                    new USDConventions().DEPOSIT_BUSINESS_DAY_CONVENTION(),
+                    new USDConventions().DEPOSIT_END_OF_MONTH(),
+                    new USDConventions().DEPOSIT_DAY_COUNTER()
             );
-            LOG.info("added depos");
+
         } else if (quoteType.equals("Futures")){
             Date iborStartDate = IMM.nextDate(Settings.instance().getEvaluationDate().add(new Period(tenor)));
-            helper = new FuturesRateHelper(quoteHandle, iborStartDate,USDConventions.LENGTH_IN_MONTHS,
-                    USDConventions.FUTURE_CALENDAR,
-                    USDConventions.FUTURE_BUSINESS_DAY_CONVENTION,
-                    USDConventions.FUTURE_END_OF_MONTH,
-                    USDConventions.FUTURE_DAY_COUNTER
+
+            helper = new FuturesRateHelper(new QuoteHandle(simpleQuote), iborStartDate,
+                    new USDConventions().LENGTH_IN_MONTHS(),
+                    new USDConventions().FUTURE_CALENDAR(),
+                    new USDConventions().FUTURE_BUSINESS_DAY_CONVENTION(),
+                    new USDConventions().FUTURE_END_OF_MONTH(),
+                    new USDConventions().FUTURE_DAY_COUNTER()
             );
-            LOG.info("added futures");
+
         } else if (quoteType.equals("Swaps")){
-            helper = new SwapRateHelper(quoteHandle, new Period(tenor),
-                    USDConventions.SWAP_FIXED_CALENDAR,
-                    USDConventions.SWAP_FIXED_FREQUENCY,
-                    USDConventions.SWAP_FIXED_CONVENTION,
-                    USDConventions.SWAP_FIXED_DAY_COUNTER,
-                    USDConventions.SWAP_FLOATING_INDEX,
+            helper = new SwapRateHelper(new QuoteHandle(simpleQuote), new Period(tenor),
+                    new USDConventions().SWAP_FIXED_CALENDAR(),
+                    new USDConventions().SWAP_FIXED_FREQUENCY(),
+                    new USDConventions().SWAP_FIXED_CONVENTION(),
+                    new USDConventions().SWAP_FIXED_DAY_COUNTER(),
+                    new USDConventions().SWAP_FLOATING_INDEX(),
                     new QuoteHandle(),new Period(0, TimeUnit.Days), discountCurve
                     );
-            LOG.info("added swaps");
+
         }
-        LOG.info("done usdratehelper");
+
         return helper;
     }
 
-    private RateHelper getEURRateHelper(String quoteType, String tenor, QuoteHandle quoteHandle, RelinkableYieldTermStructureHandle discountCurve){
+    private RateHelper getEURRateHelper(String quoteType, String tenor, org.quantlib.Quote simpleQuote, RelinkableYieldTermStructureHandle discountCurve){
         RateHelper helper = null;
         if (quoteType.equals("Depos")){
-            helper = new DepositRateHelper(quoteHandle, new Period(tenor),
+            helper = new DepositRateHelper(new QuoteHandle(simpleQuote), new Period(tenor),
                     EURConventions.DEPOSIT_FIXING_DAYS,
                     EURConventions.DEPOSIT_CALENDAR,
                     EURConventions.DEPOSIT_BUSINESS_DAY_CONVENTION,
@@ -145,14 +141,14 @@ public class CurveBuilderService {
             );
         } else if (quoteType.equals("Futures")){
             Date iborStartDate = IMM.nextDate(Settings.instance().getEvaluationDate().add(new Period(tenor)));
-            helper = new FuturesRateHelper(quoteHandle, iborStartDate,EURConventions.LENGTH_IN_MONTHS,
+            helper = new FuturesRateHelper(new QuoteHandle(simpleQuote), iborStartDate,EURConventions.LENGTH_IN_MONTHS,
                     EURConventions.FUTURE_CALENDAR,
                     EURConventions.FUTURE_BUSINESS_DAY_CONVENTION,
                     EURConventions.FUTURE_END_OF_MONTH,
                     EURConventions.FUTURE_DAY_COUNTER
             );
         } else if (quoteType.equals("Swaps")){
-            helper = new SwapRateHelper(quoteHandle, new Period(tenor),
+            helper = new SwapRateHelper(new QuoteHandle(simpleQuote), new Period(tenor),
                     EURConventions.SWAP_FIXED_CALENDAR,
                     EURConventions.SWAP_FIXED_FREQUENCY,
                     EURConventions.SWAP_FIXED_CONVENTION,

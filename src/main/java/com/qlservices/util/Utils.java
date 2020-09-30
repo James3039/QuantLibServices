@@ -1,15 +1,9 @@
 package com.qlservices.util;
 
-import com.qlservices.MarketData;
-import com.qlservices.models.Fixing;
 import org.quantlib.*;
-
-import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class Utils {
 
@@ -152,15 +146,6 @@ public class Utils {
                 ret = new Actual360();
                 break;
         }
-        return ret;
-    }
-
-    public Optional<Double> getFixingForDate(Date dt, String currency, String tenor) throws Exception{
-        Optional<Double> ret = Optional.empty();
-        List<Fixing> fixings = new MarketData().getFixingsMarketData(currency, tenor);
-        Optional<Fixing> fixing = fixings.stream().filter(fix -> fix.date.serialNumber() == dt.serialNumber()).findFirst();
-        if (fixing.isPresent())
-            ret = Optional.of(fixing.get().rate);
         return ret;
     }
 }
