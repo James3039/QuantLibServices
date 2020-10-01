@@ -68,6 +68,10 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-cache</artifactId>
     </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-mongodb-client</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -75,6 +79,7 @@
         <artifactId>maven-resources-plugin</artifactId>
         <version>3.2.0</version>
         <executions>
+
           <execution>
             <id>copy-natives</id>
             <phase>package</phase>
@@ -92,22 +97,6 @@
             </configuration>
           </execution>
 
-          <execution>
-            <id>copy-resources</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/resources/market-data</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>src/non-packaged/market-data</directory>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
         </executions>
       </plugin>
       <plugin>

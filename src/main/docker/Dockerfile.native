@@ -11,18 +11,18 @@
 #
 # Then run the container using:
 #
-# docker run -i --rm -p 8080:8080 suhasghorp/demo
+# docker run -i --rm -p 8080:8080 suhasghorp/demo -Deval_date=09-25-2020
 #
 ###
 #FROM registry.access.redhat.com/ubi8/ubi-minimal:8.1
 #FROM suhasghorp/quantlib:latest
 
 # to run in terminal with tests and jvm mode
-#  ./mvnw clean package -Dmarket_data_path=src/non-packaged/market-data
+#  ./mvnw clean package -Deval_date=09-25-2020
 # to build native image
 #./mvnw clean package -DskipTests -Pnative
 #to run native image
-#./target/QuantLibServices-1.0-SNAPSHOT-runner -Djava.library.path=/usr/local/lib -Dmarket_data_path=./target/resources/market-data
+#./target/QuantLibServices-1.0-SNAPSHOT-runner -Djava.library.path=/usr/local/lib -Deval_date=09-25-2020
 
 FROM ubuntu:latest
 WORKDIR /work/
@@ -31,7 +31,6 @@ RUN chown 1001 /work \
     && chown 1001:root /work
 COPY --chown=1001:root target/*-runner /work/application
 COPY --chown=1001:root target/resources/* /work/
-COPY --chown=1001:root target/resources/market-data/* /work/market-data/
 RUN ln -s libQuantLib.so.0.0.0 libQuantLib.so.0
 RUN ln -s libQuantLib.so.0.0.0 libQuantLib.so
 #COPY --chown=1001:root target/resources/libQuantLib.la /usr/lib/
@@ -45,4 +44,5 @@ RUN ldconfig
 EXPOSE 8080
 USER 1001
 
-CMD ["./application", "-Dquarkus.http.host=0.0.0.0", "-Dmarket_data_path=./market-data"]
+#CMD ["./application", "-Dquarkus.http.host=0.0.0.0", "-Deval_date=09-25-2020"]
+ENTRYPOINT ["./application", "-Dquarkus.http.host=0.0.0.0"]

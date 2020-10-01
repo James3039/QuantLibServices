@@ -1,5 +1,6 @@
-package com.qlservices;
+package com.qlservices.resources;
 
+import com.qlservices.MarketData;
 import com.qlservices.models.Fixing;
 import com.qlservices.models.VanillaSwap;
 import com.qlservices.services.CurveBuilderService;
@@ -55,30 +56,36 @@ public class PriceResource {
         LOG.info("swap npv:" + swap.netPresentValue);
         swap.fairRate = swap.fairRate();
 
-        double shift = 0.0001;
-        discountTermStructure.linkTo(new ZeroSpreadedTermStructure(new YieldTermStructureHandle(discountCurve), new QuoteHandle(new SimpleQuote(shift))));
-        projectionTermStructure.linkTo(new ZeroSpreadedTermStructure(new YieldTermStructureHandle(projectionCurve), new QuoteHandle(new SimpleQuote(shift))));
-        //swap.npv();
-        double npvUp = swap.npv();
+        if (swap.fullResults) {
+            double shift = 0.0001;
+            discountTermStructure.linkTo(new ZeroSpreadedTermStructure(new YieldTermStructureHandle(discountCurve), new QuoteHandle(new SimpleQuote(shift))));
+            projectionTermStructure.linkTo(new ZeroSpreadedTermStructure(new YieldTermStructureHandle(projectionCurve), new QuoteHandle(new SimpleQuote(shift))));
+            //swap.npv();
+            double npvUp = swap.npv();
 
-        discountTermStructure.linkTo(new ZeroSpreadedTermStructure(new YieldTermStructureHandle(discountCurve), new QuoteHandle(new SimpleQuote(-shift))));
-        projectionTermStructure.linkTo(new ZeroSpreadedTermStructure(new YieldTermStructureHandle(projectionCurve), new QuoteHandle(new SimpleQuote(-shift))));
-        //swap.npv();
-        double npvDown = swap.npv();
-        double dv01 = (npvDown - npvUp)/2.0;
-        swap.dv01 = swap.swapType == org.quantlib.VanillaSwap.Type.Payer ? dv01 : -1.0 * dv01;
+            discountTermStructure.linkTo(new ZeroSpreadedTermStructure(new YieldTermStructureHandle(discountCurve), new QuoteHandle(new SimpleQuote(-shift))));
+            projectionTermStructure.linkTo(new ZeroSpreadedTermStructure(new YieldTermStructureHandle(projectionCurve), new QuoteHandle(new SimpleQuote(-shift))));
+            //swap.npv();
+            double npvDown = swap.npv();
+            double dv01 = (npvDown - npvUp) / 2.0;
+            swap.dv01 = swap.swapType == org.quantlib.VanillaSwap.Type.Payer ? dv01 : -1.0 * dv01;
+            LOG.info("swap DV01: " + swap.dv01);
 
-        projectionTermStructure.linkTo(projectionCurve);
-        List<com.qlservices.models.Quote> quotes = marketData.getProjectionMarketData(marketData.getEvaluationJavaDate(), "USD", "3M");
-        for (com.qlservices.models.Quote quote : quotes){
-            double value = quote.simpleQuote.value();
-            quote.simpleQuote.setValue(value + 0.0001);
-            //projectionTermStructure.linkTo(projectionCurve);
-            double krdnpv = swap.netPresentValue - swap.npv();
-            LOG.info(quote.tenor + " KRD: " + krdnpv);
-            quote.simpleQuote.setValue(value);
-            //quote.quoteHandle.linkTo(new SimpleQuote(value));
-            //projectionTermStructure.linkTo(projectionCurve);
+            projectionTermStructure.linkTo(projectionCurve);
+            List<com.qlservices.models.Quote> quotes = marketData.getProjectionMarketData(marketData.getEvaluationJavaDate(), "USD", "3M");
+            double sumBuckets = 0.0;
+            for (com.qlservices.models.Quote quote : quotes) {
+                double value = quote.simpleQuote.value();
+                quote.simpleQuote.setValue(value + 0.0001);
+                double upNPV = swap.npv();
+                quote.simpleQuote.setValue(value - 0.0001);
+                double downNPV = swap.npv();
+                double bucketedDV01 = (upNPV - downNPV) / 2.0;
+                quote.simpleQuote.setValue(value);
+                swap.bucketedDV01.put(quote.tenor, (Math.abs(bucketedDV01) < 0.001 ? 0.0 : bucketedDV01));
+                sumBuckets += bucketedDV01;
+            }
+            LOG.info("Sum of Buckets:" + sumBuckets);
         }
 
         return swap;

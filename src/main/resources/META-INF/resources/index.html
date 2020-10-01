@@ -100,28 +100,36 @@
 <body>
 
 <div class="banner lead">
-    Your new Cloud-Native application is ready!
+    Quarkus Graal Native-Image Docker Kubernetes Powered QuantLib Microservices!
 </div>
 
 <div class="container">
     <div class="left-column">
-        <p class="lead"> Congratulations, you have created a new Quarkus application.</p>
+        <p class="lead"> Proof of Concept application to demonstrate QuantLib microservices.</p>
 
-        <h2>Why do you see this?</h2>
+        <h2>How was this built?</h2>
 
-        <p>This page is served by Quarkus. The source is in
-            <code>src/main/resources/META-INF/resources/index.html</code>.</p>
+        <p>We used Quarkus microservices framework on top of Graal JVM making JNI calls to QuantLib library.</p>
+        <p>Graal VM allows us to build a Native (yes, native!) Java application which talks to native QuantLib binary.</p>
+        <p>Building native image reduces resource requirements of the environment where the application will be running</p>
+        <p>which will be inside a Kubernetes pod in a docker container. It also increases the startup time of the application.</p>
 
-        <h2>What can I do from here?</h2>
+        <h2>What can I do here?</h2>
 
-        <p>If not already done, run the application in <em>dev mode</em> using: <code>mvn compile quarkus:dev</code>.
+        <p>As this a proof of concept, you can do one of two things:</p>
+        <p>You can price a swap by "posting" JSON representation of a Vanilla Swap at following url in a format that we expect</p>
+        <p>http://host:port/qlservices/price/vanillaswap</p>
+        <p>An example JSON format for Vanilla Swap is as follows</p>
+        <p><code>{"ID": "738641", "swapType": "PAYER", "nominal": 595000.0, "startDate": "03-06-2012",
+            "maturityDate": "03-06-2042", "fixedLegRate": 0.028037, "floatingLegSpread": 0.0, "convention" : "USD"}</code></p>
+        <!--<p>If not already done, run the application in <em>dev mode</em> using: <code>mvn compile quarkus:dev</code>.
         </p>
         <ul>
             <li>Add REST resources, Servlets, functions and other services in <code>src/main/java</code>.</li>
             <li>Your static assets are located in <code>src/main/resources/META-INF/resources</code>.</li>
             <li>Configure your application in <code>src/main/resources/application.properties</code>.
             </li>
-        </ul>
+        </ul>-->
 
         <h2>Do you like Quarkus?</h2>
         <p>Go give it a star on <a href="https://github.com/quarkusio/quarkus">GitHub</a>.</p>

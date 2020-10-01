@@ -4,11 +4,14 @@ import com.qlservices.adapters.VanillaSwapAdapter;
 import org.quantlib.*;
 
 import javax.json.bind.annotation.JsonbTypeAdapter;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 
 @JsonbTypeAdapter(VanillaSwapAdapter.class)
 public class VanillaSwap {
     public String ID;
+    public boolean fullResults = false;
     public org.quantlib.VanillaSwap.Type swapType;
     public double nominal;
     public org.quantlib.Date startDate, maturityDate;
@@ -22,6 +25,8 @@ public class VanillaSwap {
     public double dv01, netPresentValue, fairRate;
     public org.quantlib.VanillaSwap qlSwap;
     public Schedule fixedLegSchedule, floatingLegSchedule;
+    public Map<String,Double> bucketedDV01 = new LinkedHashMap<>();
+
 
     public VanillaSwap(){}
 
@@ -51,7 +56,5 @@ public class VanillaSwap {
     public double npv(){
         return qlSwap.NPV();
     }
-
-
 
 }
